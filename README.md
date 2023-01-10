@@ -16,7 +16,7 @@
 | DELETE |  /api/post/account/post/:title | social-media/controllers.DeleteAPostByTitle |
 | GET |  /api/user/users | social-media/controllers.GetAllUsers  |
 | GET |  /api/user/users/:username | social-media/controllers.GetUsersByUsername  |
-| GET |  /api/user/users/:username/posts | api/user/users/:username/posts  |
+| GET |  /api/user/users/:username/posts | social-media/controllers.GetAUsersPost  |
 | GET |  /api/user/account | social-media/controllers.GetAccountDetails  |
 | PUT |  /api/user/account | social-media/controllers.UpdateAccount  |
 | DELETE |  /api/user/account | social-media/controllers.DeleteAccount  |
