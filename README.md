@@ -21,3 +21,5 @@
 | PUT |  /api/user/account | social-media/controllers.UpdateAccount  |
 | DELETE |  /api/user/account | social-media/controllers.DeleteAccount  |
 | GET |  /api/user/account/posts | social-media/controllers.CurrentUsersPosts  |
+
+## **Enjoy Coding**
