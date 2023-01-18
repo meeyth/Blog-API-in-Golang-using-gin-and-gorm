@@ -1,54 +1,65 @@
 package controllers
 
 import (
+	"bloggify-api/models"
 	"log"
 	"net/http"
-	"social-media/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 
-	"social-media/database"
+	"bloggify-api/database"
 )
 
-func GetAllPosts(ctx *gin.Context) {
-	if posts, err := database.GetAllPostsFromDb(); err == nil {
-		ctx.IndentedJSON(http.StatusOK, posts)
+func GetPosts(c *gin.Context) {
+	title := c.Query("title")
+
+	if posts, err := database.GetPostsFromDb(title); err == nil {
+		if len(posts) == 0 {
+			c.IndentedJSON(http.StatusNotFound, gin.H{
+				"error": "No posts found with title " + title,
+			})
+			return
+		}
+		c.IndentedJSON(http.StatusOK, posts)
 		return
 	}
 
-	ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+	c.IndentedJSON(http.StatusInternalServerError, gin.H{
 		"error": "Something wen wrong in the server, please try again after a while",
 	})
-
 }
 
-func GetPostByTitle(ctx *gin.Context) {
-	title := ctx.Param("title")
+func GetPostsOfAUser(c *gin.Context) {
+	username := c.Param("username")
 
-	posts, err := database.GetPostByTitleFromDb(title)
-
-	if err != nil {
-		ctx.IndentedJSON(http.StatusNotFound, gin.H{
-			"error": err.Error(),
-		})
+	if posts, err := database.GetPostsOfAUserFromDb(username); err == nil {
+		if len(posts) == 0 {
+			c.IndentedJSON(http.StatusNotFound, gin.H{
+				"error": "This user has no posts",
+			})
+			return
+		}
+		c.IndentedJSON(http.StatusOK, posts)
 		return
 	}
 
-	ctx.IndentedJSON(http.StatusOK, posts)
+	c.IndentedJSON(http.StatusInternalServerError, gin.H{
+		"error": "Something wen wrong in the server, please try again after a while",
+	})
 }
 
-func PostAPost(ctx *gin.Context) {
-	var newPost models.Post
+func PostAPost(c *gin.Context) {
+	var newPost models.Blog
 	var currentUser models.User
 
-	claims, ok := ctx.Get("claims")
+	claims, ok := c.Get("claims")
 	if !ok {
 		log.Fatal("No claims found")
 	}
 	claimsData := claims.(*jwt.RegisteredClaims)
 
-	if err := ctx.BindJSON(&newPost); err != nil {
+	if err := c.BindJSON(&newPost); err != nil {
 		return
 	}
 	database.GetAccountDetailsFromDb(&currentUser, claimsData.Issuer)
@@ -56,51 +67,51 @@ func PostAPost(ctx *gin.Context) {
 	newPost.Creator = currentUser.UserName
 
 	if err := database.InsertAPostIntoDB(&newPost); err != nil {
-		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Something wen wrong in the server, please try again after a while",
 		})
 		return
 	}
 
-	ctx.IndentedJSON(http.StatusCreated, newPost)
+	c.IndentedJSON(http.StatusCreated, newPost)
 }
 
-func DeleteAPostByTitle(ctx *gin.Context) {
-	var post models.Post
-	title := ctx.Param("title")
+func DeleteAPostByTitle(c *gin.Context) {
+	var Blog models.Blog
+	title := c.Param("title")
 
-	claims, ok := ctx.Get("claims")
+	claims, ok := c.Get("claims")
 	if !ok {
 		log.Fatal("No claims found")
 	}
 	claimsData := claims.(*jwt.RegisteredClaims)
 
-	if err := database.DeleteAPostByTitleFromDB(&post, title, claimsData.Subject); err != nil {
-		ctx.IndentedJSON(http.StatusNotFound, gin.H{
+	if err := database.DeleteAPostByTitleFromDB(&Blog, title, claimsData.Subject); err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	ctx.IndentedJSON(http.StatusFound, post)
+	c.IndentedJSON(http.StatusFound, Blog)
 }
 
-func UpdateAPostByTitle(ctx *gin.Context) {
-	title := ctx.Param("title")
-	var toUpdateData models.Post
+func UpdateAPostByTitle(c *gin.Context) {
+	title := c.Param("title")
+	var toUpdateData models.Blog
 
-	if err := ctx.BindJSON(&toUpdateData); err != nil {
+	if err := c.BindJSON(&toUpdateData); err != nil {
 		return
 	}
 
 	updatedPost, err := database.UpdateAPostByTitleFromDb(&toUpdateData, title)
 
 	if err != nil {
-		ctx.IndentedJSON(http.StatusNotFound, gin.H{
+		c.IndentedJSON(http.StatusNotFound, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	ctx.IndentedJSON(http.StatusOK, updatedPost)
+	c.IndentedJSON(http.StatusOK, updatedPost)
 }

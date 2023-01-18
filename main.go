@@ -1,11 +1,11 @@
 package main
 
 import (
+	"bloggify-api/database"
+	"bloggify-api/routes"
 	"fmt"
 	"log"
 	"os"
-	"social-media/database"
-	"social-media/routes"
 
 	"github.com/joho/godotenv"
 )

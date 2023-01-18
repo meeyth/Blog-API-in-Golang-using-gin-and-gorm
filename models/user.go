@@ -14,7 +14,7 @@ type User struct {
 	Password []byte    `gorm:"not null" json:"-"`
 	Birthday time.Time `json:"birthday"`
 	JoinedAt time.Time `json:"joinedAt"`
-	Post     []Post    `gorm:"foreignKey:creator;references:user_name;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"-"`
+	Blog     []Blog    `gorm:"foreignKey:creator;references:user_name;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"-"`
 }
 
 // HOOKS
@@ -22,7 +22,7 @@ type User struct {
 func (u *User) BeforeDelete(tx *gorm.DB) (err error) {
 	username := u.UserName
 	fmt.Println("username", username)
-	tx.Where("creator = ?", username).Delete(&Post{})
+	tx.Where("creator = ?", username).Delete(&Blog{})
 
 	return nil
 }

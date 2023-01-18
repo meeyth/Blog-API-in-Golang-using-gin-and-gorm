@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"social-media/controllers"
+	"bloggify-api/controllers"
 
 	"github.com/gin-gonic/gin"
 )

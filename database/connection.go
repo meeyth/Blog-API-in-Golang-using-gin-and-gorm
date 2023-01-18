@@ -1,7 +1,7 @@
 package database
 
 import (
-	"social-media/models"
+	"bloggify-api/models"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -18,7 +18,7 @@ type ReqBody struct {
 var db *gorm.DB
 
 func ConnectToDb() {
-	db_conn, err := gorm.Open(sqlite.Open("api.db"), &gorm.Config{})
+	db_conn, err := gorm.Open(sqlite.Open("bloggify.db"), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
@@ -26,5 +26,5 @@ func ConnectToDb() {
 	db = db_conn
 
 	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.Post{})
+	db.AutoMigrate(&models.Blog{})
 }

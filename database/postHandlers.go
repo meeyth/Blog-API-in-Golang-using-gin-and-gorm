@@ -1,55 +1,54 @@
 package database
 
 import (
+	"bloggify-api/models"
 	"errors"
-	"social-media/models"
 )
 
-func GetAllPostsFromDb() ([]models.Post, error) {
-	var posts []models.Post
-	result := db.Find(&posts)
+func GetPostsFromDb(title string) ([]models.Blog, error) {
+	var posts []models.Blog
+
+	result := db.Where("title LIKE ?", "%"+title+"%").Find(&posts)
 
 	return posts, result.Error
 }
 
-func GetPostByTitleFromDb(title string) ([]models.Post, error) {
-	var posts []models.Post
-	db.Where("title LIKE ?", "%"+title+"%").Find(&posts)
+func GetPostsOfAUserFromDb(username string) ([]models.Blog, error) {
+	var posts []models.Blog
 
-	if len(posts) == 0 {
-		return nil, errors.New("posts with this title don't exist")
-	}
-	return posts, nil
+	result := db.Where("creator = ?", username).Find(&posts)
+
+	return posts, result.Error
 }
 
-func InsertAPostIntoDB(post *models.Post) error {
-	result := db.Create(post)
+func InsertAPostIntoDB(Blog *models.Blog) error {
+	result := db.Create(Blog)
 	return result.Error
 }
 
-func DeleteAPostByTitleFromDB(post *models.Post, title string, creator string) error {
-	db.Where("title = ?", title).First(&post)
+func DeleteAPostByTitleFromDB(Blog *models.Blog, title string, creator string) error {
+	db.Where("title = ?", title).First(&Blog)
 
-	if post.ID == 0 {
-		return errors.New("post with this title doesn't exist")
+	if Blog.ID == 0 {
+		return errors.New("blog with this title doesn't exist")
 	}
 
-	if post.Creator != creator {
-		return errors.New("this post doesn't belong to you")
+	if Blog.Creator != creator {
+		return errors.New("this Blog doesn't belong to you")
 	}
 
-	db.Delete(&post)
+	db.Delete(&Blog)
 	return nil
 }
 
-func UpdateAPostByTitleFromDb(toUpdateData *models.Post, title string) (models.Post, error) {
-	var updatedPost models.Post
+func UpdateAPostByTitleFromDb(toUpdateData *models.Blog, title string) (models.Blog, error) {
+	var updatedPost models.Blog
 	db.Where("title = ?", title).First(&updatedPost)
 
 	if updatedPost.ID == 0 {
-		return updatedPost, errors.New("post with this title doesn't exist")
+		return updatedPost, errors.New("blog with this title doesn't exist")
 	}
 
-	db.Model(&updatedPost).Updates(models.Post{Title: toUpdateData.Title, Description: toUpdateData.Description, LikeCount: toUpdateData.LikeCount})
+	db.Model(&updatedPost).Updates(models.Blog{Title: toUpdateData.Title, Description: toUpdateData.Description})
 	return updatedPost, nil
 }

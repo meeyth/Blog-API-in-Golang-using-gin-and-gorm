@@ -1,11 +1,11 @@
 package controllers
 
 import (
+	"bloggify-api/database"
+	"bloggify-api/models"
+	"bloggify-api/utils"
 	"net/http"
 	"os"
-	"social-media/database"
-	"social-media/models"
-	"social-media/utils"
 	"strconv"
 	"time"
 
@@ -14,10 +14,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func Signup(ctx *gin.Context) {
+func Signup(c *gin.Context) {
 	var body database.ReqBody
 
-	if err := ctx.BindJSON(&body); err != nil {
+	if err := c.BindJSON(&body); err != nil {
 		return
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(body.Password), 14)
@@ -39,19 +39,19 @@ func Signup(ctx *gin.Context) {
 	}
 
 	if err := database.InsertAUserIntoDb(&newUser); err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "This username is already taken",
 		})
 		return
 	}
 
-	ctx.IndentedJSON(http.StatusCreated, newUser)
+	c.IndentedJSON(http.StatusCreated, newUser)
 }
 
-func Login(ctx *gin.Context) {
+func Login(c *gin.Context) {
 	var body database.ReqBody
 
-	if err := ctx.BindJSON(&body); err != nil {
+	if err := c.BindJSON(&body); err != nil {
 		return
 	}
 
@@ -60,14 +60,14 @@ func Login(ctx *gin.Context) {
 	database.GetLoggedInUserFromDb(&user, body.UserName)
 
 	if user.ID == 0 {
-		ctx.IndentedJSON(http.StatusNotFound, gin.H{
+		c.IndentedJSON(http.StatusNotFound, gin.H{
 			"error": "User not found",
 		})
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(body.Password)); err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Wrong Password",
 		})
 		return
@@ -83,23 +83,23 @@ func Login(ctx *gin.Context) {
 	token, err := claims.SignedString([]byte(os.Getenv("SECRET_KEY")))
 
 	if err != nil {
-		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Something wen wrong in the server, please try again after a while",
 		})
 		return
 	}
 
-	ctx.SetCookie("jwt", token, 3600*24, "/", "localhost", false, true)
+	c.SetCookie("jwt", token, 3600*24, "/", "localhost", false, true)
 
-	ctx.IndentedJSON(http.StatusOK, gin.H{
+	c.IndentedJSON(http.StatusOK, gin.H{
 		"message": "success",
 	})
 }
 
-func Logout(ctx *gin.Context) {
-	ctx.SetCookie("jwt", "", -1, "/", "localhost", false, true)
+func Logout(c *gin.Context) {
+	c.SetCookie("jwt", "", -1, "/", "localhost", false, true)
 
-	ctx.IndentedJSON(http.StatusOK, gin.H{
+	c.IndentedJSON(http.StatusOK, gin.H{
 		"message": "success",
 	})
 }

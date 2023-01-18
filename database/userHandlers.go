@@ -1,26 +1,26 @@
 package database
 
 import (
+	"bloggify-api/models"
+	"bloggify-api/utils"
 	"errors"
 	"log"
-	"social-media/models"
-	"social-media/utils"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
-func GetAllUsersFromDb() ([]models.User, error) {
+func GetUsersFromDb(username string) ([]models.User, error) {
 	var users []models.User
 
-	result := db.Find(&users)
+	result := db.Where("user_name LIKE ?", "%"+username+"%").Find(&users)
 
 	return users, result.Error
 }
 
-func GetAUsersPostsFromDb(userName string) ([]models.Post, error) {
-	var posts []models.Post
+func GetAUsersPostsFromDb(username string) ([]models.Blog, error) {
+	var posts []models.Blog
 
-	result := db.Where("creator = ?", userName).Find(&posts)
+	result := db.Where("creator = ?", username).Find(&posts)
 
 	return posts, result.Error
 
@@ -56,7 +56,7 @@ func UpdateAccountFromDb(body *ReqBody, issuer string) (models.User, error) {
 
 	// Updating posts table's creator field for this user.
 
-	db.Model(&models.Post{}).Where("creator = ?", user.UserName).Update("creator", body.UserName)
+	db.Model(&models.Blog{}).Where("creator = ?", user.UserName).Update("creator", body.UserName)
 
 	// Then updating the actual user.
 
@@ -66,14 +66,3 @@ func UpdateAccountFromDb(body *ReqBody, issuer string) (models.User, error) {
 }
 
 var GetAccountDetailsFromDb = func(u *models.User, issuer string) { db.Where("id = ?", issuer).First(&u) }
-
-var GetAUserFromDb = func(userName string) ([]models.User, error) {
-	var users []models.User
-
-	db.Where("user_name LIKE ?", "%"+userName+"%").Find(&users)
-
-	if len(users) == 0 {
-		return nil, errors.New("no users found")
-	}
-	return users, nil
-}

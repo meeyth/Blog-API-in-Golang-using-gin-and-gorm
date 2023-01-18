@@ -1,6 +1,6 @@
 package database
 
-import "social-media/models"
+import "bloggify-api/models"
 
 func InsertAUserIntoDb(u *models.User) error {
 	result := db.Create(u)

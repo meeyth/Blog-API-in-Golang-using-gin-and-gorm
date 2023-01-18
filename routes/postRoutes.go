@@ -1,15 +1,15 @@
 package routes
 
 import (
-	"social-media/controllers"
-	"social-media/middleware"
+	"bloggify-api/controllers"
+	"bloggify-api/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 func postRoutes(r *gin.RouterGroup) {
-	r.GET("/posts", controllers.GetAllPosts)
-	r.GET("/post/:title", controllers.GetPostByTitle)
+	r.GET("/posts", controllers.GetPosts)
+	r.GET("/posts/:username", controllers.GetPostsOfAUser)
 
 	account := r.Group("/account")
 	account.Use(middleware.IsAuthorized())

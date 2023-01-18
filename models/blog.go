@@ -7,11 +7,10 @@ import (
 	"gorm.io/gorm"
 )
 
-type Post struct {
+type Blog struct {
 	ID          uint           `gorm:"primarykey" json:"post_id"`
 	Title       string         `gorm:"type:varchar(255);not null" json:"title"`
 	Description string         `json:"description"`
-	LikeCount   uint           `gorm:"" json:"likeCount"`
 	Creator     string         `gorm:"type:varchar(255);not null" json:"creator"`
 	CreatedAt   time.Time      `json:"createdAt"`
 	UpdatedAt   time.Time      `json:"updatedAt"`
@@ -20,7 +19,7 @@ type Post struct {
 
 // HOOKS
 
-func (p *Post) BeforeCreate(tx *gorm.DB) (err error) {
+func (p *Blog) BeforeCreate(tx *gorm.DB) (err error) {
 	creator := p.Creator
 	var user User
 
