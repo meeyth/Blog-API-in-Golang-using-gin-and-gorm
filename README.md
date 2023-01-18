@@ -2,4 +2,4 @@
 
 ## To start just run the command _`go mod download`_ to download all used packages then run _`go run main.go`_ in the root directory
 
-## _**Enjoy Coding**_
+## _**Enjoy Coding.**_
