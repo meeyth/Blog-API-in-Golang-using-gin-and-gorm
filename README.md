@@ -1,4 +1,5 @@
-# A Basic Social Media API in Golang with sqlite database support using [GIN](https://github.com/gin-gonic/gin) & [GORM](https://gorm.io/docs/index.html)
+![alt text](https://github.com/meeyth/Blog-API-in-Golang-using-gin-and-gorm/blob/main/Tech%20Stack.jpg)
+# A Social Media API in Golang with sqlite database support using [GIN](https://github.com/gin-gonic/gin) & [GORM](https://gorm.io/docs/index.html)
 
 - To start just run the command `go mod tidy` to download all used packages then run `go run main.go` in the root directory
 
